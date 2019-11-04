@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": 3,
+   "execution_count": 4,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -37,6 +37,26 @@
     "        self.fc1.weight.data.uniform_(*hidden_init(self.fc1))\n",
     "        self.fc2.weight.data.uniform_(*hidden_init(self.fc2))\n",
     "        # the final layer weights and biases of both the acotr and critic were initialized from a uniform distribution [-3x10^-3, 3x10^-3]\n",
+    "        self.fc3.weight.data.uniform_(-3e-3, 3e-3)\n",
+    "        \n",
+    "class Critic(nn.Module):\n",
+    "    def __init__(self, state_size, action_size, seed, fc1_units=400, fc2_units=300):\n",
+    "        super(Critic, self).__init__()\n",
+    "        self.seed = torch.manual_seed(seed)\n",
+    "        self.fc1 = nn.Linear(state_size, fc1_units)\n",
+    "        self.fc2 = nn.Linear(fc1_units, fc2_units)\n",
+    "        self.fc3 = nn.Linear(fc2_units, 1)\n",
+    "        self.reset_parameters()\n",
+    "        \n",
+    "    def forward(self, state, action):\n",
+    "        x = F.relu(self.bn1(self.fc1(state)))\n",
+    "        x = torch.cat((x,action), dim=1)\n",
+    "        x = F.relu(self.fc2(x))\n",
+    "        return self.fc3(x)\n",
+    "    \n",
+    "    def reset_parameters(self):\n",
+    "        self.fc1.weight.data.uniform_(*hidden_init(self.fc1))\n",
+    "        self.fc2.weight.data.uniform_(*hidden_init(self.fc2))\n",
     "        self.fc3.weight.data.uniform_(-3e-3, 3e-3)"
    ]
   },
